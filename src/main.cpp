@@ -1,67 +1,74 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include "operations.hpp"
+#include "matrix_reader.hpp"
 
 int main() {
-    // Declare matrices directly
-    std::vector<std::vector<double>> data1 = {
-        {1, 2, 3},
-        {4, 5, 6}
-    };
-    std::vector<std::vector<double>> data2 = {
-        {7, 8, 9},
-        {10, 11, 12}
-    };
-    std::vector<std::vector<double>> data5 = {
-        {1, 2},
-        {3, 4}
-    };
+    std::string file1, file2, op;
 
-    Matrix m1(data1);
-    Matrix m2(data2);
+    // Ask for file names
+    std::cout << "Enter first matrix file: ";
+    std::cin >> file1;
 
-    // Addition
-    Matrix sum = m1 + m2;
-    std::cout << "Sum:\n";
-    for (unsigned i = 0; i < sum.getRows(); ++i) {
-        for (unsigned j = 0; j < sum.getCols(); ++j)
-            std::cout << sum.at(i, j) << " ";
-        std::cout << "\n";
+    std::cout << "Enter second matrix file (or 'none' if not needed): ";
+    std::cin >> file2;
+
+    // Ask for operation
+    std::cout << "Enter operation (add, subtract, multiply, determinant): ";
+    std::cin >> op;
+
+    // Read first matrix
+    auto mat1_data = read_matrix(file1);
+    Matrix m1(mat1_data);
+
+    std::cout << "Matrix 1 size: " << mat1_data.size() << "x" 
+              << (mat1_data.empty() ? 0 : mat1_data[0].size()) << std::endl;
+
+    if (op == "determinant") {
+        std::cout << "Determinant: " << m1.determinant() << std::endl;
+        return 0;
     }
 
-    // Subtraction
-    Matrix diff = m1 - m2;
-    std::cout << "Difference:\n";
-    for (unsigned i = 0; i < diff.getRows(); ++i) {
-        for (unsigned j = 0; j < diff.getCols(); ++j)
-            std::cout << diff.at(i, j) << " ";
-        std::cout << "\n";
+    // For binary operations, read the second matrix
+    if (file2 == "none") {
+        std::cerr << "Second matrix file required for this operation.\n";
+        return 1;
     }
+    auto mat2_data = read_matrix(file2);
+    Matrix m2(mat2_data);
 
-    // Multiplication (make sure dimensions match)
-    std::vector<std::vector<double>> data3 = {
-        {1, 2},
-        {3, 4},
-        {5, 6}
-    };
-    std::vector<std::vector<double>> data4 = {
-        {7, 8, 9},
-        {10, 11, 12}
-    };
-    Matrix m3(data3);
-    Matrix m4(data4);
-    Matrix prod = m3 * m4;
-    std::cout << "Product:\n";
-    for (unsigned i = 0; i < prod.getRows(); ++i) {
-        for (unsigned j = 0; j < prod.getCols(); ++j)
-            std::cout << prod.at(i, j) << " ";
-        std::cout << "\n";
+    std::cout << "Matrix 2 size: " << mat2_data.size() << "x" 
+              << (mat2_data.empty() ? 0 : mat2_data[0].size()) << std::endl;
+
+    if (op == "add") {
+        Matrix result = m1 + m2;
+        std::cout << "Sum:\n";
+        for (unsigned i = 0; i < result.getRows(); ++i) {
+            for (unsigned j = 0; j < result.getCols(); ++j)
+                std::cout << result.at(i, j) << " ";
+            std::cout << "\n";
+        }
+    } else if (op == "subtract") {
+        Matrix result = m1 - m2;
+        std::cout << "Difference:\n";
+        for (unsigned i = 0; i < result.getRows(); ++i) {
+            for (unsigned j = 0; j < result.getCols(); ++j)
+                std::cout << result.at(i, j) << " ";
+            std::cout << "\n";
+        }
+    } else if (op == "multiply") {
+        Matrix result = m1 * m2;
+        std::cout << "Product:\n";
+        for (unsigned i = 0; i < result.getRows(); ++i) {
+            for (unsigned j = 0; j < result.getCols(); ++j)
+                std::cout << result.at(i, j) << " ";
+            std::cout << "\n";
+        }
+    } else {
+        std::cerr << "Unknown operation.\n";
+        return 1;
     }
-
-    // Determinant (must be square)
-
-    Matrix m5(data5);
-    std::cout << "Determinant: " << m5.determinant() << std::endl;
 
     return 0;
 }
